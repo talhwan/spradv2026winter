@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>detail posting</title>
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+</head>
+<body>
+deleted : <input type="checkbox" id="input_deleted" />
+id : <input type="text" id="input_id" />
+title : <input type="text" id="input_title" />
+content : <input type="text" id="input_content" />
+countlike : <input type="number" id="input_countlike" />
+
+<div id="div_img"></div>
+
+<button onclick="update_posting();">수정</button>
+<button onclick="delete_posting();">삭제</button>
+
+<br/>
+댓글  :
+<input type="text" id="input_postcmt_content"/>
+<button onclick="create_postcmt();">댓글 입력</button>
+<button onclick="list_postcmt('desc');">이전 댓글 불러오기</button>
+<button onclick="list_postcmt('asc');">최신 댓글 불러오기</button>
+<div id="div_cmt"></div>
+
+좋아요 여부  : <span id="span_my_postlike">-</span>
+<button id="btn_my_postlike" onclick="toggle_postlike();">좋아요!</button>
+
+
+<script>
+    function toggle_postlike(){
+
+        let userId = localStorage.getItem("userId");
+        if(userId === null || userId + "" === "" || userId + "" === "undefined"){
+            alert("로그인 먼저 해주세요!");
+            location.href = "/user/login";
+            return false;
+        }
+
+        let _data = {
+            postingId : $("#input_id").val()
+            , userId : userId
+        }
+
+        $.ajax({
+            //
+            url: '/api/postlike/toggle',
+            method: 'POST',
+            data : JSON.stringify(_data),
+            contentType:"application/json",
+            success: function (data, status, xhr) {
+                alert("data :" + JSON.stringify(data));
+                let liked = data["liked"];
+                let countlike = data["countlike"];
+                $("#input_countlike").val(countlike);
+                if(liked){
+                    $("#span_my_postlike").html("좋아요 했음!");
+                    $("#btn_my_postlike").html("좋아요 취소");
+                } else {
+                    $("#span_my_postlike").html("좋아요 안했음!");
+                    $("#btn_my_postlike").html("좋아요 하기");
+                }
+            },
+            error: function (data, status, err) {
+                alert("error :" + JSON.stringify(data));
+            },
+            complete: function () {
+            }
+        });
+    }
+    function liked_postlike(){
+        let userId = localStorage.getItem("userId");
+        if(userId === null || userId + "" === "" || userId + "" === "undefined"){
+            return false;
+        }
+        $.ajax({
+            //
+            url: '/api/postlike/liked',
+            method: 'GET',
+            data : {
+                userId : userId
+                , postingId : $("#input_id").val()
+            },
+            contentType:"application/json",
+            success: function (data, status, xhr) {
+                alert("data :" + JSON.stringify(data));
+                let liked = data["liked"];
+                if(liked){
+                    $("#span_my_postlike").html("좋아요 했음!");
+                    $("#btn_my_postlike").html("좋아요 취소");
+                } else {
+                    $("#span_my_postlike").html("좋아요 안했음!");
+                    $("#btn_my_postlike").html("좋아요 하기");
+                }
+            },
+            error: function (data, status, err) {
+                alert("error :" + JSON.stringify(data));
+            },
+            complete: function () {
+            }
+        });
+    }
+
+    function list_postcmt(obj_orderway){
+        let cursor = null;
+        let input_id = $(".input_postcmt_id");
+        if(input_id.length > 0){
+            if(obj_orderway + "" === "desc"){
+                cursor = $(input_id[input_id.length - 1]).val();
+            } else {
+                cursor = $(input_id[0]).val();
+            }
+        }
+        $.ajax({
+            //
+            url: '/api/postcmt/scrollList',
+            method: 'GET',
+            data : {
+                deleted : false
+                , perpage : 10
+                , orderway : obj_orderway
+                , cursor : cursor
+                , postingId : $("#input_id").val()
+            },
+            contentType:"application/json",
+            success: function (data, status, xhr) {
+                //alert("data :" + JSON.stringify(data));
+                let tempList = data;
+                for(let each of tempList){
+                    if(obj_orderway + "" === "desc"){
+                        $("#div_cmt").append(
+                            `<div><span class="font_order">-</span> // ${each.userUsername}(${each.userNick})// ${each.content} <input class="input_postcmt_id" value="${each.id}"/></div>`
+                        );
+                    } else {
+                        $("#div_cmt").prepend(
+                            `<div><span class="font_order">-</span> // ${each.userUsername}(${each.userNick})// ${each.content} <input class="input_postcmt_id" value="${each.id}"/></div>`
+                        );
+                    }
+
+                }
+
+                let tempOrder = 1;
+                let font_order = $(".font_order");
+                for(let each of font_order){
+                    $(each).html(tempOrder++);
+                }
+            },
+            error: function (data, status, err) {
+                alert("error :" + JSON.stringify(data));
+            },
+            complete: function () {
+            }
+        });
+    }
+
+    function create_postcmt(){
+
+        let userId = localStorage.getItem("userId");
+        if(userId === null || userId + "" === "" || userId + "" === "undefined"){
+            alert("로그인 먼저 해주세요!");
+            location.href = "/user/login";
+            return false;
+        }
+
+        let _data = {
+            content : $("#input_postcmt_content").val()
+            , postingId : $("#input_id").val()
+            , userId : userId
+        }
+
+        $.ajax({
+            //
+            url: '/api/postcmt',
+            method: 'POST',
+            data : JSON.stringify(_data),
+            contentType:"application/json",
+            success: function (data, status, xhr) {
+                //alert("data :" + JSON.stringify(data));
+                $("#input_postcmt_content").val("");
+                list_postcmt('asc');
+            },
+            error: function (data, status, err) {
+                alert("error :" + JSON.stringify(data));
+            },
+            complete: function () {
+            }
+        });
+    }
+</script>
+
+<script>
+    $(function(){
+        // 실행할 기능을 정의해주세요.
+        detail_posting();
+    });
+    let temp_id = location.href;
+    let array_href = temp_id.split("/");
+    if(array_href.length > 0){
+        temp_id = array_href[array_href.length - 1];
+    }
+    if(temp_id.includes("?")){
+        let array_id = temp_id.split("?");
+        temp_id = array_id[0];
+    }
+
+    function listener_delete_img(obj_id, obj_this){
+        $.ajax({
+            //
+            url: '/api/postimg',
+            method: 'DELETE',
+            data : JSON.stringify({
+                id : obj_id
+            }),
+            contentType:"application/json",
+            success: function (data, status, xhr) {
+                $(obj_this).parent().remove();
+            },
+            error: function (data, status, err) {
+                alert("error :" + JSON.stringify(data));
+            },
+            complete: function () {
+            }
+        });
+    }
+
+    function detail_posting(){
+        $.ajax({
+            //
+            url: '/api/posting',
+            method: 'GET',
+            data : {
+                id : temp_id
+            },
+            contentType:"application/json",
+            success: function (data, status, xhr) {
+                //alert("data :" + JSON.stringify(data));
+                $("#input_deleted").prop("checked", data["deleted"]);
+                $("#input_id").val(data["id"]);
+                $("#input_title").val(data["title"]);
+                $("#input_content").val(data["content"]);
+                $("#input_countlike").val(data["countlike"]);
+
+                let imgs = data["imgs"];
+                for(let each of imgs){
+                    $("#div_img").append(
+                        `<div><img src="${each.img}" style="height: 200px"/><button onclick="listener_delete_img('${each.id}', this)">삭제</button></div>`
+                    );
+                }
+                list_postcmt('desc');
+                liked_postlike();
+            },
+            error: function (data, status, err) {
+                alert("error :" + JSON.stringify(data));
+            },
+            complete: function () {
+            }
+        });
+    }
+    function update_posting(){
+        $.ajax({
+            //
+            url: '/api/posting',
+            method: 'PUT',
+            data : JSON.stringify({
+                id : $("#input_id").val()
+                , title : $("#input_title").val()
+                , content : $("#input_content").val()
+            }),
+            contentType:"application/json",
+            success: function (data, status, xhr) {
+                //alert("data :" + JSON.stringify(data));
+            },
+            error: function (data, status, err) {
+                alert("error :" + JSON.stringify(data));
+            },
+            complete: function () {
+            }
+        });
+    }
+    function delete_posting(){
+        $.ajax({
+            //
+            url: '/api/posting',
+            method: 'DELETE',
+            data : JSON.stringify({
+                id : $("#input_id").val()
+            }),
+            contentType:"application/json",
+            success: function (data, status, xhr) {
+                //alert("data :" + JSON.stringify(data));
+            },
+            error: function (data, status, err) {
+                alert("error :" + JSON.stringify(data));
+            },
+            complete: function () {
+            }
+        });
+    }
+</script>
+
+</body>
+</html>

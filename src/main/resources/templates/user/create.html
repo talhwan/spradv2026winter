@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>create user</title>
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+</head>
+<body>
+
+*username : <input type="text" class="input_param" name="username" />
+*password : <input type="password" class="input_param" name="password" />
+name : <input type="text" class="input_param" name="name" />
+*nick : <input type="text" class="input_param" name="nick" />
+phone : <input type="text" class="input_param" name="phone" />
+birth : <input type="date" class="input_param" name="birth" />
+gender :
+<select class="input_param" name="gender">
+    <option value="M">남</option>
+    <option value="F">여</option>
+</select>
+
+<button onclick="create_user();">회원가입</button>
+<script>
+    function create_user(){
+
+        let _data = {};
+        let input_param = $(".input_param");
+        for(let each of input_param){
+            _data[$(each).attr("name")] = $(each).val();
+        }
+
+        $.ajax({
+            //
+            url: '/api/user',
+            method: 'POST',
+            data : JSON.stringify(_data),
+            contentType:"application/json",
+            success: function (data, status, xhr) {
+                alert("data :" + JSON.stringify(data));
+            },
+            error: function (data, status, err) {
+                alert("error :" + JSON.stringify(data));
+            },
+            complete: function () {
+            }
+        });
+    }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>create posting</title>
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+</head>
+<body>
+
+title : <input type="text" id="input_title" />
+content : <input type="text" id="input_content" /> <br />
+images :
+<input type="file" id="file_input_img" accept="image/*" onchange="upload_file()" />
+<!--<button onclick="upload_file(); return false;">이미지 추가하기!</button>-->
+<div id="div_img"></div>
+
+<!--<button onclick="download_file();">파일 다운로드!</button>-->
+
+<button onclick="create_posting();">등록</button>
+<script>
+    function download_file(){
+        location.href = "/download/" + $("#input_filename").val();
+    }
+    function upload_file(){
+
+        let tempFile = null;
+        let inputFile = document.getElementById("file_input_img");
+        if (inputFile.files.length > 0) {
+            tempFile = inputFile.files[0];
+        }
+
+        // FormData 준비
+        let formData = new FormData();
+        formData.append('file', tempFile);
+
+        $.ajax({
+            url: "/api/default/uploadFile",
+            type: "POST",
+            data: formData,
+            cache : false,
+            contentType : false,
+            processData : false,
+            success: (data, status, xhr)=>{
+                $("#div_img").append(
+                    `<div><img src="/image/${data}" style="height: 200px"/><input type="hidden" class="input_imgs" value="/image/${data}"/><button onclick="listener_delete_img(this)">삭제</button></div>`
+                );
+            },
+            error: (data)=>{
+                alert("error")
+            },
+        });
+
+    }
+    function listener_delete_img(obj_this){
+        $(obj_this).parent().remove();
+    }
+    function create_posting(){
+
+        let userId = localStorage.getItem("userId");
+        if(userId === null || userId + "" === "" || userId + "" === "undefined"){
+            alert("로그인 먼저 해주세요!");
+            location.href = "/user/login";
+            return false;
+        }
+
+        let _data = {
+            title : $("#input_title").val()
+            , content : $("#input_content").val()
+            , img : $("#input_img").val()
+            , userId : userId
+        }
+        let input_imgs = $(".input_imgs");
+        let imgs = [];
+        for(let each of input_imgs){
+            imgs.push($(each).val());
+        }
+        _data["imgs"] = imgs;
+
+        $.ajax({
+            //
+            url: '/api/posting',
+            method: 'POST',
+            data : JSON.stringify(_data),
+            contentType:"application/json",
+            success: function (data, status, xhr) {
+                alert("data :" + JSON.stringify(data));
+            },
+            error: function (data, status, err) {
+                alert("error :" + JSON.stringify(data));
+            },
+            complete: function () {
+            }
+        });
+    }
+</script>
+
+</body>
+</html>

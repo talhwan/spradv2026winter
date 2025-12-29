@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0/EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thc.sprbasic2025fall.mapper.PostlikeMapper">
+
+	<!---->
+	<select id="detail" parameterType="hashMap" resultType="com.thc.sprbasic2025fall.dto.PostlikeDto$DetailResDto">
+		SELECT postlike.id
+			 , postlike.deleted
+			 , postlike.created_at as createdAt
+			 , postlike.modified_at as modifiedAt
+			 , postlike.posting_id as postingId
+			 , postlike.user_id as userId
+
+             , user.username as userUsername
+             , user.name as userName
+             , user.nick as userNick
+
+		FROM postlike LEFT JOIN user
+          ON postlike.user_id = user.id
+		WHERE postlike.id = #{id}
+	</select>
+
+    <!-- 공통 WHERE 절 -->
+    <sql id="commonWhere">
+        WHERE postlike.id is not null
+        <if test = "deleted != null">AND postlike.deleted = #{deleted}</if>
+        <if test = "postingId != null">AND postlike.posting_id = #{postingId}</if>
+        <if test = "userId != null">AND postlike.user_id = #{userId}</if>
+    </sql>
+
+    <select id="list" parameterType="hashMap" resultType="com.thc.sprbasic2025fall.dto.PostlikeDto$DetailResDto">
+        SELECT postlike.id
+        FROM postlike
+        <include refid="commonWhere"/>
+    </select>
+    <select id="pagedList" parameterType="hashMap" resultType="com.thc.sprbasic2025fall.dto.PostlikeDto$DetailResDto">
+        SELECT postlike.id
+        FROM postlike
+        <include refid="commonWhere"/>
+        ORDER BY
+            <if test = "orderby =='id'">postlike.id </if>
+            <if test = "orderby =='title'">postlike.title </if>
+            <if test = "orderway =='asc'">ASC </if>
+            <if test = "orderway =='desc'">DESC </if>
+        Limit #{offset}, #{perpage}
+    </select>
+    <select id="listCount" parameterType="hashMap" resultType="Integer">
+        SELECT count(postlike.id)
+        FROM postlike
+        <include refid="commonWhere"/>
+    </select>
+
+    <select id="scrollList" parameterType="hashMap" resultType="com.thc.sprbasic2025fall.dto.PostlikeDto$DetailResDto">
+        SELECT postlike.id
+        FROM postlike
+        <include refid="commonWhere"/>
+        <if test = "cursor != null">
+            <if test = "orderway != null and orderway =='desc'">AND #{cursor} > postlike.id</if>
+            <if test = "orderway != null and orderway =='asc'">AND postlike.id > #{cursor}</if>
+        </if>
+        ORDER BY postlike.id
+        <if test = "orderway != null and orderway =='desc'"> DESC</if>
+        <if test = "orderway != null and orderway =='asc'"> ASC</if>
+        Limit 0, #{perpage}
+    </select>
+</mapper>

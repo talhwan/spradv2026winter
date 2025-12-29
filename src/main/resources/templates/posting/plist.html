@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>list posting</title>
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+</head>
+<body>
+pagedList
+<!--<input type="checkbox" id="input_deleted"/>-->
+<br />
+삭제 : <select id="input_deleted">
+    <option value="">전체</option>
+    <option value="false">일반</option>
+    <option value="true">삭제</option>
+</select>
+제목 : <input id="input_title">
+호출할 페이지 : <input id="input_callpage" value="1">
+한 페이지 당 글 갯수 : <input id="input_perpage" value="10">
+정렬 기준 : <select id="input_orderby" onchange="listener_callpage(1)">
+    <option value="id">입력순</option>
+    <option value="title">제목 가나다 순</option>
+</select>
+정렬 방향 : <select id="input_orderway" onchange="listener_callpage(1)">
+    <option value="desc">역순</option>
+    <option value="asc">정순</option>
+</select>
+
+<br/>
+<div>총 글 갯수 : <span id="font_listcount">-</span></div>
+<div id="div_list"></div>
+<button onclick="list_posting()">목록조회</button>
+<div id="div_page"></div>
+
+<script>
+    $(function(){
+        list_posting();
+    });
+    function listener_callpage(obj_callpage){
+        $("#input_callpage").val(obj_callpage);
+        list_posting();
+    }
+    function list_posting(){
+        let deleted = $("#input_deleted").val() + "";
+        if(deleted === ""){
+            deleted = null;
+        } else {
+            deleted = (deleted === "true");
+        }
+        $.ajax({
+            //
+            url: '/api/posting/pagedList',
+            method: 'GET',
+            data : {
+                deleted : deleted
+                , title : $("#input_title").val()
+
+                , callpage : $("#input_callpage").val()
+                , perpage : $("#input_perpage").val()
+                , orderby : $("#input_orderby").val()
+                , orderway : $("#input_orderway").val()
+            },
+            contentType:"application/json",
+            success: function (data, status, xhr) {
+                $("#div_list").html("");
+                //alert("data :" + JSON.stringify(data));
+                let callpage = Number(data["callpage"]);
+                let perpage = Number($("#input_perpage").val());
+
+                let tempOrder = (callpage - 1) * perpage;
+
+                let tempList = data["list"];
+                for(let each of tempList){
+                    tempOrder++;
+                    $("#div_list").append(
+                      `<div onclick="location.href='/posting/detail/${each.id}';">${tempOrder} <img src="${each.img}" style="height:50px;"/>// ${each.title}</div>`
+                    );
+                }
+                let totalpage = Number(data["totalpage"]);
+                let listcount = Number(data["listcount"]);
+                $("#font_listcount").text(listcount);
+                $("#input_callpage").text(callpage);
+
+                $("#div_page").html("");
+                $("#div_page").append(`<a href="javascript:listener_callpage('1')"><<</a>`);
+                for(let i=0;i<3;i++){
+                    let temppage = callpage - 3 + i;
+                    if(temppage > 0){
+                        $("#div_page").append(`<a href="javascript:listener_callpage('${temppage}')">${temppage}</a>`);
+                    }
+                }
+
+                $("#div_page").append(`<a style="font-weight: bold;color:red" href="javascript:listener_callpage('${callpage}')">${callpage}</a>`);
+                for(let i=0;i<3;i++){
+                    let temppage = callpage + 1 + i;
+                    if(temppage <= totalpage){
+                        $("#div_page").append(`<a href="javascript:listener_callpage('${temppage}')">${temppage}</a>`);
+                    }
+                }
+
+                $("#div_page").append(`<a href="javascript:listener_callpage('${totalpage}')">>></a>`);
+
+
+
+            },
+            error: function (data, status, err) {
+                alert("error :" + JSON.stringify(data));
+            },
+            complete: function () {
+            }
+        });
+    }
+</script>
+</body>
+</html>

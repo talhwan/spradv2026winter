@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0/EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thc.sprbasic2025fall.mapper.PostcmtMapper">
+
+	<!---->
+	<select id="detail" parameterType="hashMap" resultType="com.thc.sprbasic2025fall.dto.PostcmtDto$DetailResDto">
+		SELECT postcmt.id
+			 , postcmt.deleted
+			 , postcmt.created_at as createdAt
+			 , postcmt.modified_at as modifiedAt
+			 , postcmt.posting_id as postingId
+			 , postcmt.user_id as userId
+			 , postcmt.content
+
+             , user.username as userUsername
+             , user.name as userName
+             , user.nick as userNick
+
+		FROM postcmt LEFT JOIN user
+          ON postcmt.user_id = user.id
+		WHERE postcmt.id = #{id}
+	</select>
+
+    <!-- 공통 WHERE 절 -->
+    <sql id="commonWhere">
+        WHERE postcmt.id is not null
+        <if test = "deleted != null">AND postcmt.deleted = #{deleted}</if>
+        <if test = "postingId != null">AND postcmt.posting_id = #{postingId}</if>
+        <if test = "userId != null">AND postcmt.user_id = #{userId}</if>
+    </sql>
+
+    <select id="list" parameterType="hashMap" resultType="com.thc.sprbasic2025fall.dto.PostcmtDto$DetailResDto">
+        SELECT postcmt.id
+        FROM postcmt
+        <include refid="commonWhere"/>
+    </select>
+    <select id="pagedList" parameterType="hashMap" resultType="com.thc.sprbasic2025fall.dto.PostcmtDto$DetailResDto">
+        SELECT postcmt.id
+        FROM postcmt
+        <include refid="commonWhere"/>
+        ORDER BY
+            <if test = "orderby =='id'">postcmt.id </if>
+            <if test = "orderby =='title'">postcmt.title </if>
+            <if test = "orderway =='asc'">ASC </if>
+            <if test = "orderway =='desc'">DESC </if>
+        Limit #{offset}, #{perpage}
+    </select>
+    <select id="listCount" parameterType="hashMap" resultType="Integer">
+        SELECT count(postcmt.id)
+        FROM postcmt
+        <include refid="commonWhere"/>
+    </select>
+
+    <select id="scrollList" parameterType="hashMap" resultType="com.thc.sprbasic2025fall.dto.PostcmtDto$DetailResDto">
+        SELECT postcmt.id
+        FROM postcmt
+        <include refid="commonWhere"/>
+        <if test = "cursor != null">
+            <if test = "orderway != null and orderway =='desc'">AND #{cursor} > postcmt.id</if>
+            <if test = "orderway != null and orderway =='asc'">AND postcmt.id > #{cursor}</if>
+        </if>
+        ORDER BY postcmt.id
+        <if test = "orderway != null and orderway =='desc'"> DESC</if>
+        <if test = "orderway != null and orderway =='asc'"> ASC</if>
+        Limit 0, #{perpage}
+    </select>
+</mapper>

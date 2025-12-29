@@ -1,0 +1,39 @@
+spring:
+  datasource:
+    #url: jdbc:mysql://localhost:3306/scsprbasic2025fall
+    #username: root
+    #password: abcd1234
+    url: jdbc:mysql://13.124.47.153:3306/scsprbasic2025fall
+    username: root
+    password: ivill0080@
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    defer-datasource-initialization: true
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        default_batch_fetch_size: 100
+        jdbc:
+          time_zone: Asia/Seoul
+  thymeleaf:
+    cache: false
+  devtools:
+    livereload:
+      enabled: true
+    restart:
+      enabled: true
+    remote:
+      restart:
+        enabled: false
+  freemarker:
+    cache: false
+  sql:
+    init:
+      mode: always
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB

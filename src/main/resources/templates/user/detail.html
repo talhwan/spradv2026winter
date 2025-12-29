@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>detail user</title>
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+</head>
+<body>
+deleted : <input class="input_detail" type="checkbox" id="input_deleted" />
+id : <input type="text" id="input_id" name="id" />
+username : <input type="text" id="input_username" name="username" />
+name : <input class="input_detail" type="text" id="input_name" name="name" />
+nick : <input class="input_detail" type="text" id="input_nick" name="nick" />
+phone : <input class="input_detail" type="text" id="input_phone" name="phone" />
+birth : <input class="input_detail" type="date" id="input_birth" name="birth" />
+gender :
+<select id="input_gender" name="gender">
+    <option value="M">남</option>
+    <option value="F">여</option>
+</select>
+
+<!--<button onclick="update_user();">수정</button>-->
+<button onclick="delete_user();">삭제</button>
+<script>
+    $(".input_detail").change(function(){
+        update_user(this);
+    });
+    $(function(){
+        // 실행할 기능을 정의해주세요.
+        detail_user();
+    });
+    let temp_id = location.href;
+    let array_href = temp_id.split("/");
+    if(array_href.length > 0){
+        temp_id = array_href[array_href.length - 1];
+    }
+    if(temp_id.includes("?")){
+        let array_id = temp_id.split("?");
+        temp_id = array_id[0];
+    }
+
+    function detail_user(){
+        $.ajax({
+            //
+            url: '/api/user',
+            method: 'GET',
+            data : {
+                id : temp_id
+            },
+            contentType:"application/json",
+            success: function (data, status, xhr) {
+                let detailKeys = Object.keys(data);
+                for(let each of detailKeys){
+                    let temp_type = $("#input_" + each).attr("type");
+                    if(temp_type + "" === "checkbox"){
+                        $("#input_" + each).prop("checked", data[each]);
+                    } else {
+                        $("#input_" + each).val(data[each]);
+                    }
+                }
+            },
+            error: function (data, status, err) {
+                alert("error :" + JSON.stringify(data));
+            },
+            complete: function () {
+            }
+        });
+    }
+    function update_user(obj_this){
+        let _data = {
+            id : $("#input_id").val()
+        };
+        _data[$(obj_this).attr("name")] = $(obj_this).val();
+        $.ajax({
+            //
+            url: '/api/user',
+            method: 'PUT',
+            data : JSON.stringify(_data),
+            contentType:"application/json",
+            success: function (data, status, xhr) {
+                //alert("data :" + JSON.stringify(data));
+            },
+            error: function (data, status, err) {
+                alert("error :" + JSON.stringify(data));
+            },
+            complete: function () {
+            }
+        });
+    }
+    function delete_user(){
+        $.ajax({
+            //
+            url: '/api/user',
+            method: 'DELETE',
+            data : JSON.stringify({
+                id : $("#input_id").val()
+            }),
+            contentType:"application/json",
+            success: function (data, status, xhr) {
+                //alert("data :" + JSON.stringify(data));
+            },
+            error: function (data, status, err) {
+                alert("error :" + JSON.stringify(data));
+            },
+            complete: function () {
+            }
+        });
+    }
+</script>
+
+</body>
+</html>

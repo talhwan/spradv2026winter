@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>create user</title>
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+</head>
+<body>
+
+*username : <input type="text" class="input_param" name="username" />
+*password : <input type="password" class="input_param" name="password" />
+
+<button onclick="login_user();">로그인</button>
+<script>
+    function login_user(){
+
+        let _data = {};
+        let input_param = $(".input_param");
+        for(let each of input_param){
+            _data[$(each).attr("name")] = $(each).val();
+        }
+
+        $.ajax({
+            //
+            url: '/api/user/login',
+            method: 'POST',
+            data : JSON.stringify(_data),
+            contentType:"application/json",
+            success: function (data, status, xhr) {
+                //alert("data :" + JSON.stringify(data));
+                localStorage.setItem("userId", data.id);
+                alert("로그인 성공!");
+                location.replace("/index");
+            },
+            error: function (data, status, err) {
+                alert("error :" + JSON.stringify(data));
+            },
+            complete: function () {
+            }
+        });
+    }
+</script>
+
+</body>
+</html>

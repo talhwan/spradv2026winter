@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>list user</title>
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+</head>
+<body>
+pagedList
+<!--<input type="checkbox" id="input_deleted"/>-->
+<br />
+삭제 : <select id="input_deleted">
+    <option value="">전체</option>
+    <option value="false">일반</option>
+    <option value="true">삭제</option>
+</select>
+제목 : <input id="input_title">
+한 페이지 당 글 갯수 : <input id="input_perpage" value="3">
+
+정렬 방향 : <select id="input_orderway" onchange="listener_param_changed()">
+    <option value="desc">역순</option>
+    <option value="asc">정순</option>
+</select>
+
+<div id="div_list"></div>
+<button onclick="list_user()">더보기</button>
+
+<script>
+    $(function(){
+        list_user();
+    });
+    function listener_param_changed(){
+        $("#div_list").html("");
+        list_user();
+    }
+    function list_user(){
+        let deleted = $("#input_deleted").val() + "";
+        if(deleted === ""){
+            deleted = null;
+        } else {
+            deleted = (deleted === "true");
+        }
+
+        let cursor = null;
+        let input_id = $(".input_id");
+        if(input_id.length > 0){
+            cursor = $(input_id[input_id.length - 1]).val();
+        }
+        $.ajax({
+            //
+            url: '/api/user/scrollList',
+            method: 'GET',
+            data : {
+                deleted : deleted
+                , title : $("#input_title").val()
+
+                , perpage : $("#input_perpage").val()
+                , orderway : $("#input_orderway").val()
+                , cursor : cursor
+            },
+            contentType:"application/json",
+            success: function (data, status, xhr) {
+                //alert("data :" + JSON.stringify(data));
+                let tempList = data;
+                for(let each of tempList){
+                    $("#div_list").append(
+                      `<div onclick="location.href='/user/detail/${each.id}';"><span class="font_order">-</span> // ${each.title} <input class="input_id" value="${each.id}"/></div>`
+                    );
+                }
+
+                let tempOrder = 1;
+                let font_order = $(".font_order");
+                for(let each of font_order){
+                    $(each).html(tempOrder++);
+                }
+            },
+            error: function (data, status, err) {
+                alert("error :" + JSON.stringify(data));
+            },
+            complete: function () {
+            }
+        });
+    }
+</script>
+</body>
+</html>

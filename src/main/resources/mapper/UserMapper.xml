@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0/EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thc.sprbasic2025fall.mapper.UserMapper">
+
+	<!---->
+	<select id="detail" parameterType="hashMap" resultType="com.thc.sprbasic2025fall.dto.UserDto$DetailResDto">
+		SELECT user.id
+			 , user.deleted
+			 , user.created_at as createdAt
+			 , user.modified_at as modifiedAt
+
+			 , user.username
+			 , user.name
+			 , user.nick
+			 , user.phone
+			 , user.birth
+			 , user.gender
+
+		FROM user
+		WHERE user.id = #{id}
+	</select>
+
+    <!-- 공통 WHERE 절 -->
+    <sql id="commonWhere">
+        WHERE user.id is not null
+        <if test = "deleted != null">AND user.deleted = #{deleted}</if>
+        <if test = "phone != null and phone !=''">AND user.phone LIKE CONCAT('%', #{phone})</if>
+    </sql>
+
+    <select id="list" parameterType="hashMap" resultType="com.thc.sprbasic2025fall.dto.UserDto$DetailResDto">
+        SELECT user.id
+        FROM user
+        <include refid="commonWhere"/>
+    </select>
+    <select id="pagedList" parameterType="hashMap" resultType="com.thc.sprbasic2025fall.dto.UserDto$DetailResDto">
+        SELECT user.id
+        FROM user
+        <include refid="commonWhere"/>
+        ORDER BY
+            <if test = "orderby =='id'">user.id </if>
+            <if test = "orderby =='title'">user.title </if>
+            <if test = "orderway =='asc'">ASC </if>
+            <if test = "orderway =='desc'">DESC </if>
+        Limit #{offset}, #{perpage}
+    </select>
+    <select id="listCount" parameterType="hashMap" resultType="Integer">
+        SELECT count(user.id)
+        FROM user
+        <include refid="commonWhere"/>
+    </select>
+
+    <select id="scrollList" parameterType="hashMap" resultType="com.thc.sprbasic2025fall.dto.UserDto$DetailResDto">
+        SELECT user.id
+        FROM user
+        <include refid="commonWhere"/>
+        <if test = "cursor != null">
+            <if test = "orderway != null and orderway =='desc'">AND #{cursor} > user.id</if>
+            <if test = "orderway != null and orderway =='asc'">AND user.id > #{cursor}</if>
+        </if>
+        ORDER BY user.id
+        <if test = "orderway != null and orderway =='desc'"> DESC</if>
+        <if test = "orderway != null and orderway =='asc'"> ASC</if>
+        Limit 0, #{perpage}
+    </select>
+</mapper>
