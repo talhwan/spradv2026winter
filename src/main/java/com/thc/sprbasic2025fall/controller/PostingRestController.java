@@ -4,6 +4,7 @@ import com.thc.sprbasic2025fall.domain.Posting;
 import com.thc.sprbasic2025fall.dto.DefaultDto;
 import com.thc.sprbasic2025fall.dto.PostingDto;
 import com.thc.sprbasic2025fall.service.PostingService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -21,9 +22,13 @@ public class PostingRestController {
     final PostingService postingService;
 
     @PostMapping("")
-    public ResponseEntity<DefaultDto.CreateResDto> create(@RequestBody PostingDto.CreateReqDto param) {
+    public ResponseEntity<DefaultDto.CreateResDto> create(@RequestBody PostingDto.CreateReqDto param, HttpServletRequest request) {
         //return postingService.create(param);
         //return ResponseEntity.status(HttpStatus.OK).body(postingService.create(param));
+        long userId = Long.parseLong(request.getAttribute("userId").toString());
+        System.out.println("controller : userId = " + userId);
+        param.setUserId(userId);
+
         return ResponseEntity.ok(postingService.create(param));
     }
     @PutMapping("")

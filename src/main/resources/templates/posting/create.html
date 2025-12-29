@@ -67,7 +67,7 @@ images :
             title : $("#input_title").val()
             , content : $("#input_content").val()
             , img : $("#input_img").val()
-            , userId : userId
+            //, userId : userId
         }
         let input_imgs = $(".input_imgs");
         let imgs = [];
@@ -80,6 +80,11 @@ images :
             //
             url: '/api/posting',
             method: 'POST',
+
+            beforeSend : function(xhr){
+                xhr.setRequestHeader("userId", userId);
+            },
+
             data : JSON.stringify(_data),
             contentType:"application/json",
             success: function (data, status, xhr) {
