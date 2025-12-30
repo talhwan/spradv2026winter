@@ -27,10 +27,16 @@
             data : JSON.stringify(_data),
             contentType:"application/json",
             success: function (data, status, xhr) {
-                //alert("data :" + JSON.stringify(data));
+                /*
+                alert("data :" + JSON.stringify(data));
                 localStorage.setItem("userId", data.id);
+                */
+
+                let refreshToken = xhr.getResponseHeader("RefreshToken");
+                alert(refreshToken);
                 alert("로그인 성공!");
-                location.replace("/index");
+                localStorage.setItem("refreshToken", refreshToken);
+                //location.replace("/index");
             },
             error: function (data, status, err) {
                 alert("error :" + JSON.stringify(data));

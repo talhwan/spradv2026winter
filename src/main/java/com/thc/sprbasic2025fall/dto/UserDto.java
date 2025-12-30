@@ -7,6 +7,11 @@ import lombok.experimental.SuperBuilder;
 public class UserDto {
 
 
+    @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+    public static class LoginResDto{
+        String refreshToken;
+    }
+
     @Getter @Setter @NoArgsConstructor @AllArgsConstructor
     public static class LoginReqDto{
         String username;

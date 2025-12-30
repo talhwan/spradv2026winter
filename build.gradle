@@ -37,6 +37,9 @@ dependencies {
     /* file upload */
     implementation group: 'commons-io', name: 'commons-io', version: '2.13.0'
 
+    /* AES256 */
+    implementation 'commons-codec:commons-codec:1.5'
+
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }

@@ -6,6 +6,7 @@ import com.thc.sprbasic2025fall.dto.UserDto;
 import com.thc.sprbasic2025fall.mapper.UserMapper;
 import com.thc.sprbasic2025fall.repository.UserRepository;
 import com.thc.sprbasic2025fall.service.UserService;
+import com.thc.sprbasic2025fall.util.TokenFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -22,12 +23,21 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public DefaultDto.CreateResDto login(UserDto.LoginReqDto param) {
+    public UserDto.LoginResDto login(UserDto.LoginReqDto param) {
         User user = userRepository.findByUsernameAndPassword(param.getUsername(), param.getPassword());
         if(user == null){
             throw new RuntimeException("no data");
         }
-        return DefaultDto.CreateResDto.builder().id(user.getId()).build();
+
+        String refreshToken = TokenFactory.createRefreshToken(user.getId());
+        System.out.println("refreshToken : " + refreshToken);
+
+        /*
+        Long userId = TokenFactory.validateToken(refreshToken);
+        System.out.println("userId : " + userId);
+        */
+
+        return UserDto.LoginResDto.builder().refreshToken(refreshToken).build();
     }
 
     /**/
