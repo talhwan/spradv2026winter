@@ -19,7 +19,7 @@ public class UserRestController {
     @PostMapping("/login")
     public ResponseEntity<Void> login(@RequestBody UserDto.LoginReqDto param) {
         String refreshToken = userService.login(param).getRefreshToken();
-        return ResponseEntity.ok().header("RefreshToken", refreshToken).build();
+        return ResponseEntity.ok().header("RefreshToken", "Bearer " + refreshToken).build();
     }
     /**/
 

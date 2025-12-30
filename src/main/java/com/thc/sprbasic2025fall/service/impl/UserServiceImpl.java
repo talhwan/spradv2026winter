@@ -1,9 +1,11 @@
 package com.thc.sprbasic2025fall.service.impl;
 
+import com.thc.sprbasic2025fall.domain.RefreshToken;
 import com.thc.sprbasic2025fall.domain.User;
 import com.thc.sprbasic2025fall.dto.DefaultDto;
 import com.thc.sprbasic2025fall.dto.UserDto;
 import com.thc.sprbasic2025fall.mapper.UserMapper;
+import com.thc.sprbasic2025fall.repository.RefreshTokenRepository;
 import com.thc.sprbasic2025fall.repository.UserRepository;
 import com.thc.sprbasic2025fall.service.UserService;
 import com.thc.sprbasic2025fall.util.TokenFactory;
@@ -20,6 +22,8 @@ public class UserServiceImpl implements UserService {
 
     final UserRepository userRepository;
     final UserMapper userMapper;
+    final RefreshTokenRepository refreshTokenRepository;
+    final TokenFactory tokenFactory;
 
 
     @Override
@@ -29,9 +33,15 @@ public class UserServiceImpl implements UserService {
             throw new RuntimeException("no data");
         }
 
-        String refreshToken = TokenFactory.createRefreshToken(user.getId());
+        String refreshToken = tokenFactory.createRefreshToken(user.getId());
         System.out.println("refreshToken : " + refreshToken);
 
+        //나는 중복로그인 못하게 하고 싶어!
+        List<RefreshToken> refreshTokens = refreshTokenRepository.findByUserId(user.getId());
+        refreshTokenRepository.deleteAll(refreshTokens);
+
+        RefreshToken entity =  RefreshToken.of(user.getId(), refreshToken);
+        refreshTokenRepository.save(entity);
         /*
         Long userId = TokenFactory.validateToken(refreshToken);
         System.out.println("userId : " + userId);

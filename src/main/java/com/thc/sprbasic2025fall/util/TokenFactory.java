@@ -1,31 +1,62 @@
 package com.thc.sprbasic2025fall.util;
 
+import com.thc.sprbasic2025fall.domain.RefreshToken;
+import com.thc.sprbasic2025fall.repository.RefreshTokenRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
+
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.UUID;
 
+@RequiredArgsConstructor
+@Component
 public class TokenFactory {
 
-    static int refreshTokenValidityHour = 2;
+    final RefreshTokenRepository refreshTokenRepository;
 
-    // 일단, 리프레시 토큰 만들기
-    public static String createRefreshToken(Long userId) {
+    static int refreshTokenValidityHour = 12;
+    static int accessTokenValidityHour = 1;
+
+    public String createToken(Long userId, int termHour) {
         LocalDateTime now = LocalDateTime.now();
         System.out.println("1. now : " + now);
-        now = now.plusHours(refreshTokenValidityHour);
+        now = now.plusHours(termHour);
         System.out.println("2. now : " + now);
         String token = null;
         String info = userId + "_" + now;
         try{
             token = AES256Cipher.AES_Encode(null, info);
         } catch (Exception e){}
-
         System.out.println("3. token : " + token);
-
         return token;
     }
+    // 일단, 리프레시 토큰 만들기
+    public String createRefreshToken(Long userId) {
+        return createToken(userId, refreshTokenValidityHour);
+    }
+    // 엑세스 토큰 만들기
+    public String createAccessToken(String refreshToken) {
+        Long userId = validateToken(refreshToken);
 
-    public static Long validateToken(String token) {
+        RefreshToken entity = refreshTokenRepository.findByContent(refreshToken);
+        if(entity == null){
+            return null;
+        }
+        Long userIdFromToken = entity.getUserId();
+        System.out.println("userIdFromToken : " + userIdFromToken);
+        if(!userIdFromToken.equals(userId)){
+            return null;
+        }
+
+        System.out.println("userId : " + userId);
+        if(userId == null){
+            return null;
+        }
+        return createToken(userId, accessTokenValidityHour);
+    }
+
+    public Long validateToken(String token) {
         String info = null;
         try{
             info = AES256Cipher.AES_Decode(null, token);

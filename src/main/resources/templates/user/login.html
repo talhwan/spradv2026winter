@@ -11,7 +11,11 @@
 *password : <input type="password" class="input_param" name="password" />
 
 <button onclick="login_user();">로그인</button>
+<button onclick="get_access_token();">엑세스토큰 발행!</button>
 <script>
+    localStorage.setItem("refreshToken", "Bearer 112233");
+
+
     function login_user(){
 
         let _data = {};
@@ -37,6 +41,33 @@
                 alert("로그인 성공!");
                 localStorage.setItem("refreshToken", refreshToken);
                 //location.replace("/index");
+            },
+            error: function (data, status, err) {
+                alert("error :" + JSON.stringify(data));
+            },
+            complete: function () {
+            }
+        });
+    }
+    function get_access_token(){
+
+        let refreshToken = localStorage.getItem("refreshToken");
+
+        $.ajax({
+            //
+            url: '/api/auth',
+            beforeSend : function(xhr){
+                xhr.setRequestHeader("RefreshToken", refreshToken);
+            },
+            method: 'POST',
+            data : {},
+            contentType:"application/json",
+            success: function (data, status, xhr) {
+                let aceessToken = xhr.getResponseHeader("Authorization");
+                alert(aceessToken);
+                alert("발급 성공!");
+                localStorage.setItem("accessToken", accessToken);
+                location.replace("/index");
             },
             error: function (data, status, err) {
                 alert("error :" + JSON.stringify(data));
