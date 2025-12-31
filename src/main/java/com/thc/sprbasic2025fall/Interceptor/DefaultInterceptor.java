@@ -1,9 +1,12 @@
 package com.thc.sprbasic2025fall.Interceptor;
 
+import com.thc.sprbasic2025fall.util.TokenFactory;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.util.ContentCachingRequestWrapper;
@@ -15,36 +18,23 @@ import java.util.Enumeration;
 public class DefaultInterceptor implements HandlerInterceptor {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    final TokenFactory tokenFactory;
+    public DefaultInterceptor(TokenFactory tokenFactory) {
+        this.tokenFactory = tokenFactory;
+    }
 
     //컨트롤러 진입 전에 호출되는 메서드
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         logger.info("preHandle / request [{}]", request);
-
-        Enumeration<String> headerNames = request.getHeaderNames();
-        while (headerNames.hasMoreElements()) {
-            String headerName = headerNames.nextElement();
-            String headerValue = request.getHeader(headerName);
-            //logger.info("[HEADER] " + headerName + " : " + headerValue);
+        String accessToken = request.getHeader("Authorization");
+        System.out.println("accessToken = " + accessToken);
+        Long userId = null;
+        if(accessToken != null && accessToken.startsWith("Bearer ")) {
+            accessToken = accessToken.substring(7);
+            userId = tokenFactory.validateAccessToken(accessToken);
         }
-        Enumeration<String> attributeNames = request.getAttributeNames();
-        while (attributeNames.hasMoreElements()) {
-            String attributeName = attributeNames.nextElement();
-            Object attributeValue = request.getAttribute(attributeName);
-            //logger.info("[ATTRIBUTE] " + attributeName + " : " + attributeValue);
-        }
-
-        String userId = request.getHeader("userId");
-        //System.out.println("userId = " + userId);
-
         request.setAttribute("userId", userId);
-
-        Collection<String> resHeaderNames = response.getHeaderNames();
-        //logger.info("[1HEADER RES] " + resHeaderNames);
-        for (String each : resHeaderNames) {
-            String resHeaderValue = response.getHeader(each);
-            //logger.info("[HEADER RES] " + each + " : " + resHeaderValue);
-        }
 
         return true;
     }

@@ -259,10 +259,14 @@ countlike : <input type="number" id="input_countlike" />
         });
     }
     function update_posting(){
+        let accessToken = localStorage.getItem("accessToken") + "";
         $.ajax({
             //
             url: '/api/posting',
             method: 'PUT',
+            beforeSend : function(xhr){
+                xhr.setRequestHeader("Authorization", accessToken);
+            },
             data : JSON.stringify({
                 id : $("#input_id").val()
                 , title : $("#input_title").val()
@@ -280,10 +284,14 @@ countlike : <input type="number" id="input_countlike" />
         });
     }
     function delete_posting(){
+        let accessToken = localStorage.getItem("accessToken") + "";
         $.ajax({
             //
             url: '/api/posting',
             method: 'DELETE',
+            beforeSend : function(xhr){
+                xhr.setRequestHeader("Authorization", accessToken);
+            },
             data : JSON.stringify({
                 id : $("#input_id").val()
             }),

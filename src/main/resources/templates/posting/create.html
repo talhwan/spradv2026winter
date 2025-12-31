@@ -56,10 +56,16 @@ images :
     }
     function create_posting(){
 
-        let userId = localStorage.getItem("userId");
-        if(userId === null || userId + "" === "" || userId + "" === "undefined"){
+        let is_loggedin = false;
+        let refreshToken = localStorage.getItem("refreshToken");
+        if(refreshToken === null || refreshToken + "" === "" || refreshToken + "" === "undefined"){
+        } else {
+            if(refreshToken.startsWith("Bearer ")){
+                is_loggedin = true;
+            }
+        }
+        if(!is_loggedin){
             alert("로그인 먼저 해주세요!");
-            location.href = "/user/login";
             return false;
         }
 
@@ -76,15 +82,15 @@ images :
         }
         _data["imgs"] = imgs;
 
+        let accessToken = localStorage.getItem("accessToken") + "";
+
         $.ajax({
             //
             url: '/api/posting',
             method: 'POST',
-
             beforeSend : function(xhr){
-                xhr.setRequestHeader("userId", userId);
+                xhr.setRequestHeader("Authorization", accessToken);
             },
-
             data : JSON.stringify(_data),
             contentType:"application/json",
             success: function (data, status, xhr) {

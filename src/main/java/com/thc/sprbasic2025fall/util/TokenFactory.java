@@ -16,12 +16,20 @@ public class TokenFactory {
     final RefreshTokenRepository refreshTokenRepository;
 
     static int refreshTokenValidityHour = 12;
-    static int accessTokenValidityHour = 1;
+    static int accessTokenValidityTerm = 1;
 
     public String createToken(Long userId, int termHour) {
         LocalDateTime now = LocalDateTime.now();
         System.out.println("1. now : " + now);
-        now = now.plusHours(termHour);
+
+        //now = now.plusHours(termHour);
+        // 엑세스 토큰 엄청 줄이기!
+        if(termHour == accessTokenValidityTerm) {
+            now = now.plusMinutes(1);
+        } else {
+            now = now.plusHours(termHour);
+        }
+
         System.out.println("2. now : " + now);
         String token = null;
         String info = userId + "_" + now;
@@ -37,7 +45,7 @@ public class TokenFactory {
     }
     // 엑세스 토큰 만들기
     public String createAccessToken(String refreshToken) {
-        Long userId = validateToken(refreshToken);
+        Long userId = validateToken(refreshToken); //리프레시 토큰
 
         RefreshToken entity = refreshTokenRepository.findByContent(refreshToken);
         if(entity == null){
@@ -53,7 +61,16 @@ public class TokenFactory {
         if(userId == null){
             return null;
         }
-        return createToken(userId, accessTokenValidityHour);
+        return createToken(userId, accessTokenValidityTerm);
+    }
+
+    // 엑세스 토큰 검증하기
+    public Long validateAccessToken(String token) {
+        Long userId = validateToken(token);
+        if(userId == null) {
+            throw new RuntimeException("please check your RefreshToken");
+        }
+        return userId; //엑세스토큰 검증!
     }
 
     public Long validateToken(String token) {

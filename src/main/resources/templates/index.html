@@ -9,11 +9,16 @@
 Hello World!
 
 <script>
-    let userId = localStorage.getItem("userId");
-    if(userId === null || userId + "" === "" || userId + "" === "undefined"){
+
+    let refreshToken = localStorage.getItem("refreshToken");
+    if(refreshToken === null || refreshToken + "" === "" || refreshToken + "" === "undefined"){
         alert("not yet!");
     } else {
-        alert("logged in!");
+        if(refreshToken.startsWith("Bearer ")){
+            alert("logged in!");
+        } else {
+            alert("not yet!");
+        }
     }
 </script>
 </body>

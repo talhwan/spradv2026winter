@@ -13,9 +13,7 @@
 <button onclick="login_user();">로그인</button>
 <button onclick="get_access_token();">엑세스토큰 발행!</button>
 <script>
-    localStorage.setItem("refreshToken", "Bearer 112233");
-
-
+    //localStorage.setItem("refreshToken", "Bearer 112233");
     function login_user(){
 
         let _data = {};
@@ -63,8 +61,8 @@
             data : {},
             contentType:"application/json",
             success: function (data, status, xhr) {
-                let aceessToken = xhr.getResponseHeader("Authorization");
-                alert(aceessToken);
+                let accessToken = xhr.getResponseHeader("Authorization");
+                alert(accessToken);
                 alert("발급 성공!");
                 localStorage.setItem("accessToken", accessToken);
                 location.replace("/index");
