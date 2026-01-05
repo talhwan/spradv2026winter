@@ -1,15 +1,20 @@
 package com.thc.sprbasic2025fall.service.impl;
 
 import com.thc.sprbasic2025fall.domain.RefreshToken;
+import com.thc.sprbasic2025fall.domain.RoleType;
 import com.thc.sprbasic2025fall.domain.User;
+import com.thc.sprbasic2025fall.domain.UserRoleType;
 import com.thc.sprbasic2025fall.dto.DefaultDto;
 import com.thc.sprbasic2025fall.dto.UserDto;
 import com.thc.sprbasic2025fall.mapper.UserMapper;
 import com.thc.sprbasic2025fall.repository.RefreshTokenRepository;
+import com.thc.sprbasic2025fall.repository.RoleTypeRepository;
 import com.thc.sprbasic2025fall.repository.UserRepository;
+import com.thc.sprbasic2025fall.repository.UserRoleTypeRepository;
 import com.thc.sprbasic2025fall.service.UserService;
 import com.thc.sprbasic2025fall.util.TokenFactory;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -22,8 +27,11 @@ public class UserServiceImpl implements UserService {
 
     final UserRepository userRepository;
     final UserMapper userMapper;
+    final BCryptPasswordEncoder bCryptPasswordEncoder;
     final RefreshTokenRepository refreshTokenRepository;
     final TokenFactory tokenFactory;
+    final RoleTypeRepository roleTypeRepository;
+    final UserRoleTypeRepository userRoleTypeRepository;
 
 
     @Override
@@ -62,8 +70,25 @@ public class UserServiceImpl implements UserService {
         if(user != null){
             throw new RuntimeException("already exist");
         }
+        //스프링 시큐리티 에서 사용하는 알고리즘 사용해야만 합니다!
+        param.setPassword(bCryptPasswordEncoder.encode(param.getPassword()));
+        User newUser = userRepository.save(param.toEntity());
 
-        return userRepository.save(param.toEntity()).toCreateResDto();
+        /*
+        개발 편의를 위해 넣어둔 코드
+        * */
+        String typeName = "ROLE_USER";
+        RoleType roleType = roleTypeRepository.findByTypeName(typeName);
+        if(roleType == null){
+            roleType = RoleType.of("user", typeName);
+            roleTypeRepository.save(roleType);
+        }
+        /**/
+
+        UserRoleType userRoleType = UserRoleType.of(newUser, roleType);
+        userRoleTypeRepository.save(userRoleType);
+
+        return newUser.toCreateResDto();
     }
 
     @Override

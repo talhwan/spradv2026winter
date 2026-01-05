@@ -8,7 +8,7 @@ import lombok.Setter;
 
 @Getter
 @Entity
-public class Posting extends AuditingFileds{
+public class Posting extends AuditingFields {
     @Setter Long userId;
 
     @Setter String title;

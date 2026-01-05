@@ -8,7 +8,7 @@ import lombok.Setter;
 
 @Getter
 @Entity
-public class Postimg extends AuditingFileds{
+public class Postimg extends AuditingFields {
     @Setter Long postingId;
     @Setter String img;
 

@@ -60,9 +60,7 @@ images :
         let refreshToken = localStorage.getItem("refreshToken");
         if(refreshToken === null || refreshToken + "" === "" || refreshToken + "" === "undefined"){
         } else {
-            if(refreshToken.startsWith("Bearer ")){
-                is_loggedin = true;
-            }
+            is_loggedin = true;
         }
         if(!is_loggedin){
             alert("로그인 먼저 해주세요!");

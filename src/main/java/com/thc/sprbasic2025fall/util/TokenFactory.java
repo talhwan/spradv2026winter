@@ -47,7 +47,7 @@ public class TokenFactory {
     public String createAccessToken(String refreshToken) {
         Long userId = validateToken(refreshToken); //리프레시 토큰
 
-        RefreshToken entity = refreshTokenRepository.findByContent(refreshToken);
+        RefreshToken entity = refreshTokenRepository.findByContent(refreshToken).orElse(null);
         if(entity == null){
             return null;
         }

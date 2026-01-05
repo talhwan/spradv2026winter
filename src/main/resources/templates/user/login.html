@@ -24,13 +24,14 @@
 
         $.ajax({
             //
-            url: '/api/user/login',
+            url: '/api/login',
             method: 'POST',
             data : JSON.stringify(_data),
             contentType:"application/json",
             success: function (data, status, xhr) {
-                /*
                 alert("data :" + JSON.stringify(data));
+                /*
+
                 localStorage.setItem("userId", data.id);
                 */
 

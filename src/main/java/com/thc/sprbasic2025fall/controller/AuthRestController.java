@@ -1,6 +1,8 @@
 package com.thc.sprbasic2025fall.controller;
 
 import com.thc.sprbasic2025fall.dto.UserDto;
+import com.thc.sprbasic2025fall.security.AuthService;
+import com.thc.sprbasic2025fall.security.ExternalProperties;
 import com.thc.sprbasic2025fall.util.TokenFactory;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -21,22 +23,19 @@ import java.util.Date;
 @RestController // 페이지 리턴이 아니라, 객체 리턴할꺼에요!
 public class AuthRestController {
 
-    final TokenFactory tokenFactory;
+    //final TokenFactory tokenFactory;
+    final AuthService authService;
+    final ExternalProperties externalProperties;
 
     @PostMapping("")
     public ResponseEntity<Void> access(HttpServletRequest request) {
         String refreshToken = request.getHeader("RefreshToken");
-        if(!refreshToken.startsWith("Bearer ")) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        String accessToken = null;
+        if(refreshToken != null && refreshToken.startsWith(externalProperties.getTokenPrefix())){
+            String token = refreshToken.substring(externalProperties.getTokenPrefix().length());
+            accessToken = authService.issueAccessToken(token);
         }
-
-        refreshToken = refreshToken.substring(7);
-
-        String accessToken = tokenFactory.createAccessToken(refreshToken);
-        if(accessToken == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-        return ResponseEntity.ok().header("Authorization", "Bearer " + accessToken).build();
+        return ResponseEntity.ok().header(externalProperties.getAccessKey(), externalProperties.getTokenPrefix() + accessToken).build();
     }
 
 }

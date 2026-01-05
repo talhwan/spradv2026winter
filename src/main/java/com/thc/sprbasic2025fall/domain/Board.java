@@ -9,7 +9,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-public class Board extends AuditingFileds{
+public class Board extends AuditingFields {
     String title;
     String content;
     String author;

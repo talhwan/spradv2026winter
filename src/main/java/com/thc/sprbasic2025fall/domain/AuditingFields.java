@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @MappedSuperclass
-public class AuditingFileds {
+public class AuditingFields {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) Long id;
     Boolean deleted;
     @CreatedDate @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime createdAt;

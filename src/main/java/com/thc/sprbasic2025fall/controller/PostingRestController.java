@@ -3,14 +3,18 @@ package com.thc.sprbasic2025fall.controller;
 import com.thc.sprbasic2025fall.domain.Posting;
 import com.thc.sprbasic2025fall.dto.DefaultDto;
 import com.thc.sprbasic2025fall.dto.PostingDto;
+import com.thc.sprbasic2025fall.security.PrincipalDetails;
 import com.thc.sprbasic2025fall.service.PostingService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.Map;
 
@@ -21,27 +25,13 @@ public class PostingRestController {
 
     final PostingService postingService;
 
+    @PreAuthorize("hasRole('USER')")
+    //@PreAuthorize("permitAll()")
     @PostMapping("")
-    public ResponseEntity<DefaultDto.CreateResDto> create(@RequestBody PostingDto.CreateReqDto param, HttpServletRequest request) {
-        //return postingService.create(param);
-        //return ResponseEntity.status(HttpStatus.OK).body(postingService.create(param));
-        /*
-        long userId = Long.parseLong(request.getAttribute("userId").toString());
-        System.out.println("controller : userId = " + userId);
+    public ResponseEntity<DefaultDto.CreateResDto> create(@RequestBody PostingDto.CreateReqDto param, @AuthenticationPrincipal PrincipalDetails principalDetails) {
+        System.out.println("principalDetails User id: " + principalDetails.getUser().getId());
+        Long userId = principalDetails.getUser().getId();
         param.setUserId(userId);
-        */
-
-        Long userId = (Long) request.getAttribute("userId");
-        System.out.println("userId = " + userId);
-        if(userId == null){
-            //로그인 안되었을때 돌려보내기!
-            System.out.println("userId is null");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-        } else {
-            //로그인 되었을때!!
-            param.setUserId(userId);
-        }
-
         return ResponseEntity.ok(postingService.create(param));
     }
     @PutMapping("")
