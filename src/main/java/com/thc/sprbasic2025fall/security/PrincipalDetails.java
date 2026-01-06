@@ -60,9 +60,7 @@ public class PrincipalDetails implements UserDetails {
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		Collection<GrantedAuthority> authorities = new ArrayList<>();
-		user.getRoleList().forEach(userRoleType->{
-			authorities.add(()->userRoleType.getRoleType().getTypeName());
-		});
+        authorities.add(()->"ROLE_USER");
 		return authorities;
 	}
 
