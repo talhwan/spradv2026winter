@@ -10,17 +10,9 @@
              , permission.deleted
              , permission.created_at as createdAt
              , permission.modified_at as modifiedAt
-             , permission.user_id as userId
              , permission.title
              , permission.content
-             , permission.img
-             , permission.countlike
-
-             , user.username as userUsername
-             , user.name as userName
-             , user.nick as userNick
-        FROM permission LEFT JOIN user
-          ON permission.user_id = user.id
+        FROM permission
         WHERE permission.id = ${id}
 	</select>
 
@@ -28,7 +20,6 @@
     <sql id="commonWhere">
         WHERE permission.id is not null
         <if test = "deleted != null">AND permission.deleted = #{deleted}</if>
-        <if test = "userId != null">AND permission.user_id = #{userId}</if>
         <if test = "title != null and title !=''">AND permission.title LIKE CONCAT('%', #{title}, '%')</if>
     </sql>
 

@@ -22,6 +22,10 @@ public class DefaultPageController {
         System.out.println("DefaultPageController.index()");
         return "index"; //페이지컨트롤러 리턴값! src->resources->templates 아래에 있는 리턴값, index.html을 찾아서 파씽해줌!!
     }
+    @RequestMapping("/admin") //찾아올수 있는 주소값을 설정한 것입니다!
+    public String admin(){
+        return "admin";
+    }
 
     @ResponseBody
     @RequestMapping(value = "/image/{file_name:.+}", method = {RequestMethod.GET,RequestMethod.POST})

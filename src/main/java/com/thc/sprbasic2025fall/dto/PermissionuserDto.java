@@ -1,58 +1,47 @@
 package com.thc.sprbasic2025fall.dto;
 
-import com.thc.sprbasic2025fall.domain.Permission;
+import com.thc.sprbasic2025fall.domain.Permissionuser;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
-import java.util.List;
-
-public class PermissionDto {
-
-    public static String[][] targets ={
-            {"permission", "권한"}
-            , {"user", "사용자"}
-            , {"notice", "공지사항"}
-    };
+public class PermissionuserDto {
 
     @Getter @Setter @NoArgsConstructor @AllArgsConstructor
     public static class CreateReqDto{
-        String title;
-        String content;
+        Long permissionId;
+        Long userId;
 
-        public Permission toEntity(){
-            return Permission.of(getTitle(), getContent());
+        public Permissionuser toEntity(){
+            return Permissionuser.of(getPermissionId(), getUserId());
         }
     }
 
     @Getter @Setter @NoArgsConstructor @AllArgsConstructor @SuperBuilder
     public static class UpdateReqDto extends DefaultDto.UpdateReqDto{
-        String title;
-        String content;
+        Long permissionId;
+        Long userId;
     }
     @Getter @Setter @NoArgsConstructor @AllArgsConstructor @SuperBuilder
     public static class DetailResDto extends DefaultDto.DetailResDto {
-        String title;
-        String content;
-
-        //이 권한이 가지고 있는 전체 권한상세 목록
-        List<PermissiondetailDto.DetailResDto> details;
-
-        //이 프로젝트에서 다루고 있는 권한 테이블 전체 목록
-        String[][] targets;
+        Long permissionId;
+        Long userId;
     }
     @Getter @Setter @NoArgsConstructor @AllArgsConstructor @SuperBuilder
     public static class ListReqDto extends DefaultDto.ListReqDto {
-        String title;
+        Long permissionId;
+        Long userId;
     }
     @Getter @Setter @NoArgsConstructor @AllArgsConstructor @SuperBuilder
     public static class PagedListReqDto extends DefaultDto.PagedListReqDto {
-        String title;
+        Long permissionId;
+        Long userId;
     }
     @Getter @Setter @NoArgsConstructor @AllArgsConstructor @SuperBuilder
     public static class ScrollListReqDto extends DefaultDto.ScrollListReqDto {
-        String title;
+        Long permissionId;
+        Long userId;
     }
 }

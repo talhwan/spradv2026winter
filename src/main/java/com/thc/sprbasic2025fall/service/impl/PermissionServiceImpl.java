@@ -3,9 +3,11 @@ package com.thc.sprbasic2025fall.service.impl;
 import com.thc.sprbasic2025fall.domain.Permission;
 import com.thc.sprbasic2025fall.dto.DefaultDto;
 import com.thc.sprbasic2025fall.dto.PermissionDto;
+import com.thc.sprbasic2025fall.dto.PermissiondetailDto;
 import com.thc.sprbasic2025fall.mapper.PermissionMapper;
 import com.thc.sprbasic2025fall.repository.PermissionRepository;
 import com.thc.sprbasic2025fall.service.PermissionService;
+import com.thc.sprbasic2025fall.service.PermissiondetailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -18,10 +20,10 @@ public class PermissionServiceImpl implements PermissionService {
 
     final PermissionRepository permissionRepository;
     final PermissionMapper permissionMapper;
+    final PermissiondetailService permissiondetailService;
 
     @Override
     public DefaultDto.CreateResDto create(PermissionDto.CreateReqDto param, Long reqUserId) {
-        param.setUserId(reqUserId);
         DefaultDto.CreateResDto res = permissionRepository.save(param.toEntity()).toCreateResDto();
         return res;
     }
@@ -29,9 +31,6 @@ public class PermissionServiceImpl implements PermissionService {
     @Override
     public void update(PermissionDto.UpdateReqDto param, Long reqUserId) {
         Permission permission = permissionRepository.findById(param.getId()).orElseThrow(() -> new RuntimeException("no data"));
-        if(!reqUserId.equals(permission.getUserId())) {
-            throw new RuntimeException("you don't have permission to update permission");
-        }
         permission.update(param);
         permissionRepository.save(permission);
 
@@ -42,20 +41,22 @@ public class PermissionServiceImpl implements PermissionService {
         update(PermissionDto.UpdateReqDto.builder().id(param.getId()).deleted(true).build(), reqUserId);
     }
 
-    public PermissionDto.DetailResDto get(DefaultDto.DetailReqDto param) {
+    public PermissionDto.DetailResDto get(DefaultDto.DetailReqDto param, Long reqUserId) {
         PermissionDto.DetailResDto res = permissionMapper.detail(param.getId());
+        res.setDetails(permissiondetailService.list(PermissiondetailDto.ListReqDto.builder().deleted(false).permissionId(res.getId()).build(), reqUserId));
+        res.setTargets(PermissionDto.targets);
         return res;
     }
 
     @Override
     public PermissionDto.DetailResDto detail(DefaultDto.DetailReqDto param, Long reqUserId) {
-        return get(param);
+        return get(param, reqUserId);
     }
 
     public List<PermissionDto.DetailResDto> addlist(List<PermissionDto.DetailResDto> list, Long reqUserId) {
         List<PermissionDto.DetailResDto> newList = new ArrayList<>();
         for (PermissionDto.DetailResDto permission : list) {
-            newList.add(get(DefaultDto.DetailReqDto.builder().id(permission.getId()).build()));
+            newList.add(get(DefaultDto.DetailReqDto.builder().id(permission.getId()).build(), reqUserId));
         }
         return newList;
     }
