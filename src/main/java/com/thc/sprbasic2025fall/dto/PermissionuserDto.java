@@ -13,6 +13,7 @@ public class PermissionuserDto {
     public static class CreateReqDto{
         Long permissionId;
         Long userId;
+        String username;
 
         public Permissionuser toEntity(){
             return Permissionuser.of(getPermissionId(), getUserId());
@@ -28,6 +29,9 @@ public class PermissionuserDto {
     public static class DetailResDto extends DefaultDto.DetailResDto {
         Long permissionId;
         Long userId;
+
+        String userUsername;
+        String userNick;
     }
     @Getter @Setter @NoArgsConstructor @AllArgsConstructor @SuperBuilder
     public static class ListReqDto extends DefaultDto.ListReqDto {

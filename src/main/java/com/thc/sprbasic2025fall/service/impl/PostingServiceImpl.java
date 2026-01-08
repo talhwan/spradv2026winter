@@ -3,8 +3,10 @@ package com.thc.sprbasic2025fall.service.impl;
 import com.thc.sprbasic2025fall.domain.Posting;
 import com.thc.sprbasic2025fall.dto.DefaultDto;
 import com.thc.sprbasic2025fall.dto.PostingDto;
+import com.thc.sprbasic2025fall.exception.NoPermissionException;
 import com.thc.sprbasic2025fall.mapper.PostingMapper;
 import com.thc.sprbasic2025fall.repository.PostingRepository;
+import com.thc.sprbasic2025fall.service.PermittedService;
 import com.thc.sprbasic2025fall.service.PostingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,9 +20,14 @@ public class PostingServiceImpl implements PostingService {
 
     final PostingRepository postingRepository;
     final PostingMapper postingMapper;
+    final PermittedService permittedService;
+
+    String target = "posting";
 
     @Override
     public DefaultDto.CreateResDto create(PostingDto.CreateReqDto param, Long reqUserId) {
+        permittedService.check(target, 110, reqUserId);
+
         param.setUserId(reqUserId);
         DefaultDto.CreateResDto res = postingRepository.save(param.toEntity()).toCreateResDto();
         return res;
@@ -28,6 +35,8 @@ public class PostingServiceImpl implements PostingService {
 
     @Override
     public void update(PostingDto.UpdateReqDto param, Long reqUserId) {
+        permittedService.check(target, 120, reqUserId);
+
         Posting posting = postingRepository.findById(param.getId()).orElseThrow(() -> new RuntimeException("no data"));
         if(!reqUserId.equals(posting.getUserId())) {
             throw new RuntimeException("you don't have permission to update posting");
@@ -42,20 +51,21 @@ public class PostingServiceImpl implements PostingService {
         update(PostingDto.UpdateReqDto.builder().id(param.getId()).deleted(true).build(), reqUserId);
     }
 
-    public PostingDto.DetailResDto get(DefaultDto.DetailReqDto param) {
+    public PostingDto.DetailResDto get(DefaultDto.DetailReqDto param, Long reqUserId) {
+        //permittedService.check(target, 200, reqUserId);
         PostingDto.DetailResDto res = postingMapper.detail(param.getId());
         return res;
     }
 
     @Override
     public PostingDto.DetailResDto detail(DefaultDto.DetailReqDto param, Long reqUserId) {
-        return get(param);
+        return get(param, reqUserId);
     }
 
     public List<PostingDto.DetailResDto> addlist(List<PostingDto.DetailResDto> list, Long reqUserId) {
         List<PostingDto.DetailResDto> newList = new ArrayList<>();
         for (PostingDto.DetailResDto posting : list) {
-            newList.add(get(DefaultDto.DetailReqDto.builder().id(posting.getId()).build()));
+            newList.add(get(DefaultDto.DetailReqDto.builder().id(posting.getId()).build(), reqUserId));
         }
         return newList;
     }

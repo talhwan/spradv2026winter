@@ -10,9 +10,12 @@
              , permissionuser.modified_at as modifiedAt
              , permissionuser.permission_id as permissionId
              , permissionuser.user_id as userId
-             , permissionuser.func
-        FROM permissionuser
+
+             , user.username as userUsername
+             , user.nick as userNick
+        FROM permissionuser, user
         WHERE permissionuser.id = ${id}
+          AND permissionuser.user_id = user.id
 	</select>
 
     <!-- 공통 WHERE 절 -->

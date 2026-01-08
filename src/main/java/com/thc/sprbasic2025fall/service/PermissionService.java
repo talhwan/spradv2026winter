@@ -8,6 +8,8 @@ import java.util.List;
 
 @Service
 public interface PermissionService {
+    List<String> access(Long reqUserId);
+    /**/
     DefaultDto.CreateResDto create(PermissionDto.CreateReqDto param, Long reqUserId);
     void update(PermissionDto.UpdateReqDto param, Long reqUserId);
     void delete(PermissionDto.UpdateReqDto param, Long reqUserId);

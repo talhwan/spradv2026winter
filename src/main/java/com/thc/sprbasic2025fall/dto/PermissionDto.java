@@ -1,10 +1,7 @@
 package com.thc.sprbasic2025fall.dto;
 
 import com.thc.sprbasic2025fall.domain.Permission;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import java.util.List;
@@ -15,8 +12,18 @@ public class PermissionDto {
             {"permission", "권한"}
             , {"user", "사용자"}
             , {"notice", "공지사항"}
+            , {"posting", "게시글"}
     };
 
+    @Getter @Setter @Builder
+    @NoArgsConstructor @AllArgsConstructor
+    public static class IspermittedReqDto{
+        Long userId;
+        String target;
+        Integer func;
+    }
+
+    /**/
     @Getter @Setter @NoArgsConstructor @AllArgsConstructor
     public static class CreateReqDto{
         String title;

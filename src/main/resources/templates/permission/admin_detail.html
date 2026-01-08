@@ -215,7 +215,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                <label class="col-form-label">*사용자id</label>
+                <label class="col-form-label">*사용자 아이디</label>
                 <div>
                     <input type="text" class="form-control m-b input_required" id="create_permissionuser_username" keyword="username" placeholder="내용을 입력하세요" />
                 </div>
@@ -287,6 +287,63 @@
         _data.success = function (obj_data, obj_status, obj_xhr) {
         }
         _data.error = function (obj_data, obj_status, obj_xhr) {
+            alert("정상적으로 이루어지지 않았습니다. 다시 시도해주세요.");
+        }
+        func_ajax(_data);
+    }
+    function delete_permissionuser(obj_id) {
+        let _param = {};
+        _param["id"] = obj_id;
+
+        let _data = new Map();
+        _data.url = "/api/permissionuser";
+        _data.type = "DELETE";
+        _data.param = _param;
+        _data.success = function (obj_data, obj_status, obj_xhr) {
+            search_permissionuser();
+        }
+        _data.error = function (obj_data, obj_status, obj_xhr) {
+            alert("정상적으로 이루어지지 않았습니다. 다시 시도해주세요.");
+        }
+        func_ajax(_data);
+    }
+    function create_permissionuser() {
+        let _param = {};
+        let permissionId = getIdFromUrl(null);
+        _param["permissionId"] = permissionId;
+        _param["username"] = $("#create_permissionuser_username").val();
+
+        let _data = new Map();
+        _data.url = "/api/permissionuser";
+        _data.type = "POST";
+        _data.param = _param;
+        _data.success = function (obj_data, obj_status, obj_xhr) {
+            $("#createPermissionuser").modal("hide");
+            $("#create_permissionuser_username").val("");
+            search_permissionuser();
+        }
+        _data.error = function (obj_data, obj_status, obj_xhr) {
+            alert("정상적으로 이루어지지 않았습니다. 다시 시도해주세요.");
+        }
+        func_ajax(_data);
+    }
+    function search_permissionuser() {
+        let _data = new Map();
+        _data.url = "/api/permissionuser/list";
+        _data.type = "GET";
+        _data.param = {
+            deleted : false
+        };
+        _data.success = function(obj_data, obj_status, obj_xhr){
+            $("#tbody_permissionuser_list").html("");
+            let tempList = obj_data;
+            for(let each of tempList){
+                let tList = [];
+                tList.push(each);
+                $("#tbody_permissionuser_list").append(list_info_permissionuser_template({"resultData_permissionuser":tList}));
+            }
+        }
+        _data.error = function(obj_data, obj_status, obj_xhr){
             alert("정상적으로 이루어지지 않았습니다. 다시 시도해주세요.");
         }
         func_ajax(_data);

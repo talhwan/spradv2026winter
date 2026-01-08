@@ -27,6 +27,14 @@ public class PermissionRestController {
     }
 
     @PreAuthorize("hasRole('USER')")
+    @GetMapping("/access")
+    public ResponseEntity<List<String>> access(@AuthenticationPrincipal PrincipalDetails principalDetails) {
+        return ResponseEntity.ok(permissionService.access(getUserId(principalDetails)));
+    }
+
+    /**/
+
+    @PreAuthorize("hasRole('USER')")
     //@PreAuthorize("permitAll()")
     @PostMapping("")
     public ResponseEntity<DefaultDto.CreateResDto> create(@RequestBody PermissionDto.CreateReqDto param, @AuthenticationPrincipal PrincipalDetails principalDetails) {

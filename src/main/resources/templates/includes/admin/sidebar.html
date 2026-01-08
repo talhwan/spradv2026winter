@@ -28,7 +28,7 @@
     </div>
 
     <!-- Nav Item - Pages Collapse Menu -->
-    <li class="nav-item nav_div_permission nav_div_user" style="display: none1">
+    <li class="nav-item nav_div_permission nav_div_user" style="display: none">
         <a class="nav-link collapsed nav_permission_a" href="#" data-toggle="collapse" data-target="#nav_permission_div" aria-expanded="true" aria-controls="collapseTwo">
             <i class="fas fa-fw fa-cog"></i>
             <span>권한관리</span>
@@ -58,20 +58,21 @@
 
 <script>
     $( document ).ready(function() {
-        //search_permissiondetail();
+        access_permission();
     });
-    function search_permissiondetail() {
+    function access_permission() {
         let _data = new Map();
-        _data.url = "/api/permissiondetail/access";
+        _data.url = "/api/permission/access";
         _data.type = "GET";
         _data.param = {};
         _data.success = function(obj_data, obj_status, obj_xhr){
             /*
-            alert(JSON.stringify(obj_data));
+
             */
+            alert(JSON.stringify(obj_data));
             let tempList = obj_data;
             for(let each of tempList){
-                let tempTarget = each["target"];
+                let tempTarget = each;
                 $(".nav_div_" + tempTarget).css("display", "");
             }
             if(tempList == null || tempList.length === 0){

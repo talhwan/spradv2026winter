@@ -49,7 +49,8 @@ public class PermissionuserRestController {
     public ResponseEntity<PermissionuserDto.DetailResDto> detail(DefaultDto.DetailReqDto param, @AuthenticationPrincipal PrincipalDetails principalDetails) {
         return ResponseEntity.ok(permissionuserService.detail(param, getUserId(principalDetails)));
     }
-    @PreAuthorize("hasRole('ADMIN')")
+    //@PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("permitAll()")
     @GetMapping("/list")
     public ResponseEntity<List<PermissionuserDto.DetailResDto>> list(PermissionuserDto.ListReqDto param, @AuthenticationPrincipal PrincipalDetails principalDetails) {
         return ResponseEntity.ok(permissionuserService.list(param, getUserId(principalDetails)));
